@@ -1,4 +1,4 @@
-# Trump-Tweet
+# Fake-Trump-Tweet
 
 A project to generate words and sentences based on Trump's tweets, using an LSTM network.
 
