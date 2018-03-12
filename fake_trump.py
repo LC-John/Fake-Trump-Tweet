@@ -26,9 +26,9 @@ def load_model():
                   min_lr=0.0005,
                   seq_len=57,
                   vocab_size=2402,
-                  n_embedding=300,
+                  n_embedding=1000,
                   n_out=2402,
-                  n_cell=300,
+                  n_cell=1000,
                   rand_seed=1234)
         trump = trump_data.TRUMP(trump_data.trump_tokenized_dataset_path_default,
                                  trump_data.trump_token_dict_path_default)

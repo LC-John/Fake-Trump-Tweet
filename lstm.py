@@ -175,9 +175,9 @@ if __name__ == "__main__":
               min_lr=0.0005,
               seq_len=57,
               vocab_size=2402,
-              n_embedding=300,
+              n_embedding=1000,
               n_out=2402,
-              n_cell=300,
+              n_cell=1000,
               rand_seed=1234)
     nn.build_arch()
     
@@ -192,7 +192,7 @@ if __name__ == "__main__":
                              trump_data.trump_token_dict_path_default)
     
     iter_per_epoch = int(len(trump.get_train_data()) / batch_size)
-    lr_decay = iter_per_epoch
+    lr_decay = iter_per_epoch * 3
     
     tr_acc, tr_loss, va_acc = 0, 0, 0
     best_va_acc = 0
@@ -203,7 +203,7 @@ if __name__ == "__main__":
         if (iter % iter_per_epoch == 0):
             if (int(iter / iter_per_epoch) % save_epoch == 0):
                 save_path = nn.save_arch(sess)
-                print ("\tModel saved at " + save_path)
+                print ("\n\tModel saved at " + save_path)
             else:
                 print ("")
         
@@ -240,6 +240,6 @@ if __name__ == "__main__":
                 % (100*(iter%iter_per_epoch+1)/iter_per_epoch,
                    tr_loss, tr_acc, va_acc, best_va_acc), end="")
             
-    print ("Training complete!")
+    print ("\nTraining complete!")
     save_path = nn.save_arch(sess)
-    print ("\tModel saved at " + save_path)
+    print ("\n\tModel saved at " + save_path)
