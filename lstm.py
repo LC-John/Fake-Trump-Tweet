@@ -171,17 +171,25 @@ if __name__ == "__main__":
     valid_print_iter = 60
     save_epoch = 2
     
-    nn = LSTM()
+    nn = LSTM(max_lr=0.01,
+              min_lr=0.0005,
+              seq_len=57,
+              vocab_size=2402,
+              n_embedding=300,
+              n_out=2402,
+              n_cell=300,
+              rand_seed=1234)
     nn.build_arch()
     
-    os.environ['CUDA_VISIBLE_DEVICES'] = '1'
+    os.environ['CUDA_VISIBLE_DEVICES'] = '0'
     tf_config = tf.ConfigProto()  
     tf_config.gpu_options.allow_growth = True
     init = tf.global_variables_initializer()
     sess = tf.InteractiveSession(config=tf_config)
     sess.run(init)
     
-    trump = trump_data.TRUMP()
+    trump = trump_data.TRUMP(trump_data.trump_tokenized_dataset_path_default,
+                             trump_data.trump_token_dict_path_default)
     
     iter_per_epoch = int(len(trump.get_train_data()) / batch_size)
     lr_decay = iter_per_epoch

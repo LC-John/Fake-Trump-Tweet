@@ -10,12 +10,15 @@ import random
 import numpy
 
 import os
-import sys
 trump_dir_path_default = os.path.split(os.path.realpath(__file__))[0]
 trump_dataset_path_default = os.path.join(trump_dir_path_default,
                                           "trump.pkl.gz")
 trump_letter_dict_path_default = os.path.join(trump_dir_path_default,
                                               "letter_dict.pkl.gz")
+trump_tokenized_dataset_path_default = os.path.join(trump_dir_path_default,
+                                                    "trump_tokenized.pkl.gz")
+trump_token_dict_path_default = os.path.join(trump_dir_path_default,
+                                             "token_dict.pkl.gz")
 
 class TRUMP():
     
@@ -130,5 +133,6 @@ class TRUMP():
         
 if __name__ == "__main__":
     
-    trump = TRUMP()
-    x, y, l = trump.minibatch(100000)
+    trump = TRUMP(trump_tokenized_dataset_path_default,
+                  trump_token_dict_path_default)
+    #x, y, l = trump.minibatch(100000)

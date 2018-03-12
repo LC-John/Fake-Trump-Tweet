@@ -8,8 +8,8 @@ Created on Thu Mar  8 15:39:44 2018
 import zipfile
 import json
 import pickle, gzip
-import os, sys
-import numpy
+import os
+import re
 
 trump_dir_path_default = os.path.split(os.path.realpath(__file__))[0]
 trump_raw_path_default = os.path.join(trump_dir_path_default,
@@ -20,6 +20,10 @@ trump_dataset_path_default = os.path.join(trump_dir_path_default,
                                           "trump.pkl.gz")
 trump_letter_dict_path_default = os.path.join(trump_dir_path_default,
                                               "letter_dict.pkl.gz")
+trump_tokenized_dataset_path_default = os.path.join(trump_dir_path_default,
+                                                    "trump_tokenized.pkl.gz")
+trump_token_dict_path_default = os.path.join(trump_dir_path_default,
+                                             "token_dict.pkl.gz")
 
 def extract_zip_all(raw_path=trump_raw_path_default,
                     ex_path=trump_ex_path_default):
@@ -63,7 +67,60 @@ def get_letter_dict(data, threshold=89):
         letter_dict[key] = letter_cnt
         letter_cnt += 1
     return letter_dict
-   
+    
+def token_segmentation(data):
+    
+    punctuation = ['.', ',', '!', '/', ':', ';',
+                   '+', '-', '*', '?', '~', '|',
+                   '[', ']', '{', '}', '(', ')',
+                   '_', '=', '%', '&', '$', '#',
+                   '"', '`', '^', '—', '@']
+    ret = []
+                   
+    for sent in data:
+        tmp_token_seq = sent.split()
+        
+        tmp_sent = ""
+        for t in range(len(tmp_token_seq)):
+            if ("http" in tmp_token_seq[t] \
+                or "https" in tmp_token_seq[t]):
+                tmp_sent += " urlurlurlurlurl "
+            elif "'" in tmp_token_seq[t]:
+                tmp_idx = tmp_token_seq[t].index("'")
+                tmp_sent += " " + tmp_token_seq[t][:tmp_idx]
+                tmp_sent += " " + tmp_token_seq[t][tmp_idx:]
+            elif "’" in tmp_token_seq[t]:
+                tmp_idx = tmp_token_seq[t].index("’")
+                tmp_sent += " " + tmp_token_seq[t][:tmp_idx]
+                tmp_sent += " " + tmp_token_seq[t][tmp_idx:]
+            else:
+                tmp_sent += " " + tmp_token_seq[t]
+
+        tmp_sent = tmp_sent.replace('\n', ' ').lower()
+        for p in punctuation:
+            tmp_sent = tmp_sent.replace(p, ' '+p+' ')
+        tmp_sent = re.sub(r'\d+\.?\d*', ' numnumnumnum ', tmp_sent)
+        
+        ret.append(tmp_sent.split())
+    return ret
+            
+def get_token_dict(data, show_up_threshold=10):
+    
+    cnt = {}
+    for seq in data:
+        for t in seq:
+            if t in cnt.keys():
+                cnt[t] += 1
+            else:
+                cnt[t] = 1
+    cnt = sorted(cnt.items(), key=lambda d: d[1], reverse=True)
+    
+    ret = {}
+    for i in cnt:
+        if i[1] > show_up_threshold:
+            ret[i[0]] = len(ret)
+    return ret
+    
 def save_dataset(data, path=trump_dataset_path_default):
     
     with gzip.open(path, "wb") as f:
@@ -86,6 +143,28 @@ def load_letter_dict(path=trump_letter_dict_path_default):
         letter_dict = pickle.load(f)
     return letter_dict
     
+def save_tokenized_dataset(data, path=trump_tokenized_dataset_path_default):
+    
+    with gzip.open(path, "wb") as f:
+        pickle.dump(data, f)
+        
+def load_tokenized_dataset(path=trump_tokenized_dataset_path_default):
+    
+    with gzip.open(path, "rb") as f:
+        data = pickle.load(f)
+    return data
+    
+def save_token_dict(token_dict, path=trump_token_dict_path_default):
+    
+    with gzip.open(path, "wb") as f:
+        pickle.dump(token_dict, f)
+        
+def load_token_dict(path=trump_token_dict_path_default):
+    
+    with gzip.open(path, "rb") as f:
+        token_dict = pickle.load(f)
+    return token_dict
+    
 if __name__ == "__main__":
     
     #extract_zip_all("raw_trump", "ex_trump")
@@ -94,7 +173,17 @@ if __name__ == "__main__":
     
     data = load_dataset(trump_dataset_path_default)
     
+    #data_tokenized = token_segmentation(data)
+    #save_tokenized_dataset(data_tokenized, "trump_tokenized.pkl.gz")
+    
+    data_tokenized = load_tokenized_dataset(trump_tokenized_dataset_path_default)
+    
     #letter = get_letter_dict(data)
     #save_letter_dict(letter)
     
     letter = load_letter_dict(trump_letter_dict_path_default)
+    
+    token = get_token_dict(data_tokenized, 20)
+    save_token_dict(token)
+    
+    token = load_token_dict(trump_token_dict_path_default)
