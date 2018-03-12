@@ -4,7 +4,7 @@ A project to generate words and sentences based on Trump's tweets, using an LSTM
 
 ## Dataset
 
-The dataset is from the repo, **trump tweet data archive**, by 16:37, Mar. 8, 2018. The github address is https://github.com/bpb27/trump_tweet_data_archive
+The dataset is from the repo, **trump tweet data archive**, at 16:37, Mar. 8, 2018. The github address is https://github.com/bpb27/trump_tweet_data_archive
 
 ## Current Model
 
